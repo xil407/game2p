@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Shadow Mage - Cross Platform</title>
+    <title>Shadow Mage - Full Fix</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body { margin: 0; background: #111; overflow: hidden; font-family: 'Courier New', monospace; touch-action: none; color: white; }
@@ -27,9 +27,8 @@
         .hp-fill { height: 100%; background: #ff4444; width: 100%; transition: 0.1s; }
         .mana-fill { position: absolute; bottom: -6px; left: 0; height: 4px; background: #4444ff; width: 100%; }
 
-        /* MODAL TOMBOL KHUSUS HP */
         #mobileControls {
-            position: fixed; bottom: 20px; width: 100%; display: none; /* Default sembunyi */
+            position: fixed; bottom: 20px; width: 100%; display: none;
             justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 50;
         }
         .touch-btn {
@@ -40,7 +39,6 @@
         }
         .touch-btn:active { background: rgba(0,255,255,0.3); transform: scale(0.9); }
         
-        /* CSS MAGIC: Tampilkan tombol hanya jika perangkat mendukung touch */
         @media (pointer: coarse) {
             #mobileControls { display: flex; }
         }
@@ -82,6 +80,12 @@
         const ctx = canvas.getContext("2d");
         const music = document.getElementById("bgMusic");
 
+        // 1. TAMBAHKAN LOGIKA BACKGROUND DI SINI
+        const bgImages = ["background.jpeg", "beach.jpeg", "stone.jpeg", "snow.jpeg"];
+        const bgImg = new Image();
+        // Memilih satu background secara acak saat halaman dibuka
+        bgImg.src = bgImages[Math.floor(Math.random() * bgImages.length)];
+
         const heroes = [
             { name: "Shadow", img: "player.png", speed: 7, color: "#00ffff", dmg: 14, manaCost: 20, flip: false },
             { name: "Knight", img: "enemy.png", speed: 4, color: "#ffaa00", dmg: 22, manaCost: 35, flip: false },
@@ -115,7 +119,6 @@
             pNum===1 ? p1Idx = idx : p2Idx = idx;
         }
 
-        // LOGIKA INPUT TOUCH
         const bindTouch = (id, key) => {
             const el = document.getElementById(id);
             el.ontouchstart = (e) => { e.preventDefault(); keys[key] = true; if(key==='Space') startAttack(p1,p2,heroes[p1Idx].color); if(key==='KeyF') shootMagic(p1,p1Idx); };
@@ -173,7 +176,10 @@
 
         function update() {
             if(!gameActive || isGameOver) return;
-            ctx.clearRect(0,0,canvas.width,canvas.height);
+            
+            // 2. GANTI ctx.clearRect DENGAN DRAWIMAGE BACKGROUND
+            ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
             if(shakeTime > 0) { ctx.translate((Math.random()-0.5)*10, (Math.random()-0.5)*10); shakeTime--; }
 
             if(keys["KeyA"] && p1.x > 0) p1.x -= p1.speed;
