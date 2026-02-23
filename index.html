@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pixel Fight - Saiyan Charge Edition</title>
+    <title>Pixel Fight - Ultimate Full Roster</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body { margin: 0; background: #111; overflow: hidden; font-family: 'Courier New', monospace; touch-action: none; color: white; }
@@ -15,42 +15,35 @@
 
         .select-container { 
             display: flex; justify-content: center; gap: 10px; width: 100%; 
-            max-width: 800px; max-height: 60vh; overflow-y: auto;
-            padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;
+            max-width: 900px; max-height: 65vh; overflow-y: auto;
+            padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;
         }
         
-        .select-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .char-card { border: 1px solid #444; padding: 3px; text-align: center; cursor: pointer; border-radius: 5px; background: #222; width: 55px; font-size: 8px; }
-        .char-card.selected-p1 { border-color: #00ffff; box-shadow: 0 0 8px #00ffff; }
-        .char-card.selected-p2 { border-color: #ff4444; box-shadow: 0 0 8px #ff4444; }
-        .char-card img { width: 40px; height: 40px; display: block; margin: 0 auto 2px; border-radius: 3px; object-fit: cover; }
+        .select-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .char-card { border: 1px solid #444; padding: 5px; text-align: center; cursor: pointer; border-radius: 5px; background: #222; width: 65px; font-size: 10px; transition: 0.2s; }
+        .char-card.selected-p1 { border-color: #00ffff; box-shadow: 0 0 10px #00ffff; transform: scale(1.05); }
+        .char-card.selected-p2 { border-color: #ff4444; box-shadow: 0 0 10px #ff4444; transform: scale(1.05); }
+        .char-card img { width: 50px; height: 50px; display: block; margin: 0 auto 3px; border-radius: 3px; object-fit: cover; }
         
-        #startButton { margin-top: 20px; padding: 12px 40px; font-size: 18px; font-weight: bold; background: #00ffff; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        #startButton { margin-top: 20px; padding: 15px 50px; font-size: 20px; font-weight: bold; background: #00ffff; border: none; border-radius: 8px; cursor: pointer; color: black; }
 
         #ui { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-around; pointer-events: none; z-index: 10; }
-        .hp-bar { width: 120px; height: 14px; background: #444; border: 2px solid #fff; border-radius: 4px; position: relative; }
-        .hp-fill { height: 100%; background: #ff4444; width: 100%; transition: 0.1s; }
-        .mana-fill { position: absolute; bottom: -6px; left: 0; height: 4px; background: #4444ff; width: 100%; }
-
-        #pauseOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: none; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 150;
-        }
+        .hp-bar { width: 140px; height: 16px; background: #444; border: 2px solid #fff; border-radius: 4px; position: relative; }
+        .hp-fill { height: 100%; background: #ff4444; width: 100%; transition: 0.2s; }
+        .mana-fill { position: absolute; bottom: -8px; left: 0; height: 5px; background: #4444ff; width: 100%; transition: 0.2s; }
 
         #mobileControls {
-            position: fixed; bottom: 10px; width: 100%; display: none;
-            justify-content: space-between; padding: 0 15px; box-sizing: border-box; z-index: 50;
+            position: fixed; bottom: 15px; width: 100%; display: none;
+            justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 50;
         }
-        .control-group { display: flex; gap: 8px; align-items: flex-end; }
+        .control-group { display: flex; gap: 10px; align-items: flex-end; }
         .touch-btn {
-            width: 50px; height: 50px; background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
+            width: 55px; height: 55px; background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.4); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 10px; user-select: none;
+            font-weight: bold; font-size: 11px; user-select: none; color: white;
         }
-        
-        #btn-pause { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 35px; height: 35px; z-index: 100; pointer-events: auto; }
+        #btn-pause { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; z-index: 100; pointer-events: auto; }
 
         @media (pointer: coarse) { #mobileControls { display: flex; } }
     </style>
@@ -60,7 +53,7 @@
     <audio id="bgMusic" loop><source src="naruto.mp3" type="audio/mpeg"></audio>
 
     <div id="startOverlay">
-        <h2 style="margin: 0 0 10px 0; color: #00ffff; font-size: 22px;">Pixel Fight</h2>
+        <h1 style="margin: 0 0 15px 0; color: #00ffff; text-shadow: 0 0 10px #00ffff;">PIXEL FIGHT: GOD SPEED</h1>
         <div class="select-container">
             <div id="p1-box" class="select-box"></div>
             <div id="p2-box" class="select-box"></div>
@@ -68,30 +61,25 @@
         <button id="startButton">MULAI BERTARUNG</button>
     </div>
 
-    <div id="pauseOverlay">
-        <h1>PAUSE</h1>
-        <button onclick="togglePause()">LANJUTKAN</button>
-    </div>
-
     <div id="ui">
         <div><div class="hp-bar"><div id="hp-p1" class="hp-fill"></div><div id="mana-p1" class="mana-fill"></div></div></div>
-        <div id="btn-pause" class="touch-btn" onclick="togglePause()">||</div>
+        <div id="btn-pause" class="touch-btn" onclick="location.reload()">RESET</div>
         <div><div class="hp-bar"><div id="hp-p2" class="hp-fill"></div><div id="mana-p2" class="mana-fill"></div></div></div>
     </div>
 
     <div id="mobileControls">
         <div class="control-group">
             <div class="touch-btn" id="t-left">←</div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div class="touch-btn" id="t-up">↑</div>
                 <div class="touch-btn" id="t-down">CHRG</div>
             </div>
             <div class="touch-btn" id="t-right">→</div>
         </div>
         <div class="control-group">
-            <div class="touch-btn" id="t-hit" style="background: rgba(255, 68, 68, 0.4);">HIT</div>
-            <div class="touch-btn" id="t-ult" style="background: rgba(255, 255, 255, 0.4);">ULT</div>
-            <div class="touch-btn" id="t-magic" style="background: rgba(68, 68, 255, 0.4);">MAG</div>
+            <div class="touch-btn" id="t-hit" style="background: rgba(255, 68, 68, 0.5);">HIT</div>
+            <div class="touch-btn" id="t-ult" style="background: rgba(255, 255, 255, 0.5);">ULT</div>
+            <div class="touch-btn" id="t-magic" style="background: rgba(68, 68, 255, 0.5);">MAG</div>
         </div>
     </div>
 
@@ -102,10 +90,8 @@
         const ctx = canvas.getContext("2d");
         const music = document.getElementById("bgMusic");
 
-        // Perbaikan Background: Inisialisasi gambar di sini
-        const bgImages = ["background.jpeg", "beach.jpeg", "stone.jpeg", "snow.jpeg"];
         const bgImg = new Image();
-        bgImg.src = bgImages[Math.floor(Math.random() * bgImages.length)];
+        bgImg.src = "background.jpeg";
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSound(type) {
@@ -122,42 +108,43 @@
                 osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now);
                 gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
                 osc.start(); osc.stop(now + 0.2);
-            } else if (type === 'charge') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(100, now);
-                osc.frequency.linearRampToValueAtTime(300, now + 0.1);
+            } else if (type === 'blink') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(900, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
                 gain.gain.setValueAtTime(0.05, now); osc.start(); osc.stop(now + 0.1);
             }
         }
 
+        // FULL ROSTER RESTORED
         const heroes = [
-            { name: "Shadow", img: "player.png", speed: 7, color: "#00ffff", dmg: 14, manaCost: 20, flip: false },
-            { name: "Knight", img: "enemy.png", speed: 4, color: "#ffaa00", dmg: 22, manaCost: 35, flip: false },
-            { name: "Kla", img: "ka.png", speed: 5, color: "#ff0000", dmg: 21, manaCost: 25, flip: false },
-            { name: "Ran", img: "za.png", speed: 5, color: "#777", dmg: 20, manaCost: 29, flip: false },
+            { name: "Shadow", img: "player.png", speed: 7, color: "#00ffff", dmg: 14, manaCost: 20 },
+            { name: "Knight", img: "enemy.png", speed: 4, color: "#ffaa00", dmg: 22, manaCost: 35 },
+            { name: "Kla", img: "ka.png", speed: 5, color: "#ff0000", dmg: 21, manaCost: 25 },
+            { name: "Ran", img: "za.png", speed: 5, color: "#777", dmg: 20, manaCost: 29 },
             { name: "Rin", img: "zi.png", speed: 6, color: "white", dmg: 22, manaCost: 31, flip: true },
-            { name: "Shizu", img: "zu.png", speed: 7, color: "pink", dmg: 21, manaCost: 27, flip: false },
+            { name: "Shizu", img: "zu.png", speed: 7, color: "pink", dmg: 21, manaCost: 27 },
             { name: "Agus", img: "agus.png", speed: 6, color: "yellow", dmg: 23, manaCost: 19, flip: true },
-            { name: "Tarno", img: "tarno.png", speed: 7, color: "#0fe", dmg: 25, manaCost: 40, flip: false },
-            { name: "Sai", img: "sai.png", speed: 7, color: "black", dmg: 24, manaCost: 25, flip: false },
-            { name: "Ghost rider", img: "rider.png", speed: 8, color: "#fcff00", dmg: 23, manaCost: 23, flip: false },
-            { name: "Sukuna", img: "sukuna.png", speed: 9, color: "white", dmg: 22, manaCost: 22, flip: false },
-            { name: "Alex", img: "as.gif", speed: 5, color: "blue", dmg: 21, manaCost: 22, flip: false },
-            { name: "Saske", img: "saske.gif", speed: 7, color: "#fcff00", dmg: 22, manaCost: 24, flip: false },
-            { name: "Ryu", img: "ryu.gif", speed: 6, color: "#0fe", dmg: 21, manaCost: 23, flip: false },
-            { name: "X-MAN", img: "wolf.gif", speed: 7, color: "yellow", dmg: 21, manaCost: 23, flip: false },
-            { name: "Lutpi", img: "lutfy.gif", speed: 7, color: "#0fe", dmg: 21, manaCost: 23, flip: false },
-            { name: "Asep", img: "asep.png", speed: 7, color: "black", dmg: 21, manaCost: 23, flip: false },
-            { name: "Venom", img: "venom.gif", speed: 6, color: "white", dmg: 21, manaCost: 23, flip: false },
+            { name: "Tarno", img: "tarno.png", speed: 7, color: "#0fe", dmg: 25, manaCost: 40 },
+            { name: "Sai", img: "sai.png", speed: 7, color: "black", dmg: 24, manaCost: 25 },
+            { name: "Ghost rider", img: "rider.png", speed: 8, color: "#fcff00", dmg: 23, manaCost: 23 },
+            { name: "Sukuna", img: "sukuna.png", speed: 9, color: "white", dmg: 22, manaCost: 22 },
+            { name: "Alex", img: "as.gif", speed: 5, color: "blue", dmg: 21, manaCost: 22 },
+            { name: "Saske", img: "saske.gif", speed: 7, color: "#fcff00", dmg: 22, manaCost: 24 },
+            { name: "Ryu", img: "ryu.gif", speed: 6, color: "#0fe", dmg: 21, manaCost: 23 },
+            { name: "X-MAN", img: "wolf.gif", speed: 7, color: "yellow", dmg: 21, manaCost: 23 },
+            { name: "Lutpi", img: "lutfy.gif", speed: 7, color: "#0fe", dmg: 21, manaCost: 23 },
+            { name: "Asep", img: "asep.png", speed: 7, color: "black", dmg: 21, manaCost: 23 },
+            { name: "Venom", img: "venom.gif", speed: 6, color: "white", dmg: 21, manaCost: 23 },
             { name: "Kibo", img: "kibo.png", speed: 6, color: "green", dmg: 20, manaCost: 24, flip: true }
         ];
 
         let p1Idx = 0, p2Idx = 1;
-        let gameActive = false, isGameOver = false, paused = false, shakeTime = 0;
+        let gameActive = false, isGameOver = false, shakeTime = 0;
         let projectiles = [], particles = [], slashes = [], auras = [], keys = {};
         const gravity = 0.8;
 
-        const p1 = { x: 100, y: 0, w: 0, h: 0, hp: 100, mana: 100, vy: 0, jumping: false, charging: false, dir: 1, attacking: false, attackAngle: 0, img: new Image() };
-        const p2 = { x: 0, y: 0, w: 0, h: 0, hp: 100, mana: 100, vy: 0, jumping: false, charging: false, dir: -1, attacking: false, attackAngle: 0, img: new Image(), lastInput: 0 };
+        const p1 = { x: 100, y: 0, w: 0, h: 0, hp: 100, mana: 100, vy: 0, jumping: false, charging: false, dir: 1, attacking: false, invul: false, alpha: 1, img: new Image() };
+        const p2 = { x: 0, y: 0, w: 0, h: 0, hp: 100, mana: 100, vy: 0, jumping: false, charging: false, dir: -1, attacking: false, invul: false, alpha: 1, img: new Image() };
 
         function initSelection() {
             const p1Box = document.getElementById("p1-box");
@@ -174,20 +161,12 @@
             pNum===1 ? p1Idx = idx : p2Idx = idx;
         }
 
-        function togglePause() {
-            if(!gameActive || isGameOver) return;
-            paused = !paused;
-            document.getElementById("pauseOverlay").style.display = paused ? "flex" : "none";
-            if(paused) music.pause(); else music.play();
-        }
-
         const bindTouch = (id, key) => {
             const el = document.getElementById(id);
             el.ontouchstart = (e) => { e.preventDefault(); keys[key] = true; };
             el.ontouchend = () => keys[key] = false;
         };
-        bindTouch('t-left', 'KeyA'); bindTouch('t-right', 'KeyD');
-        bindTouch('t-up', 'KeyW'); bindTouch('t-down', 'KeyS');
+        bindTouch('t-left', 'KeyA'); bindTouch('t-right', 'KeyD'); bindTouch('t-up', 'KeyW'); bindTouch('t-down', 'KeyS');
         bindTouch('t-hit', 'Space'); bindTouch('t-magic', 'KeyF'); bindTouch('t-ult', 'KeyR');
 
         function resize() {
@@ -199,139 +178,132 @@
         }
 
         window.addEventListener("resize", resize);
-        window.addEventListener("keydown", e => { if(e.code === "KeyP") togglePause(); keys[e.code] = true; });
+        window.addEventListener("keydown", e => keys[e.code] = true);
         window.addEventListener("keyup", e => keys[e.code] = false);
 
-        function jump(c) { if(!c.jumping && !c.charging) { c.vy = -18; c.jumping = true; playSound('jump'); } }
-
         function startAttack(at, ta, col) {
-            if(at.attacking || at.charging || paused) return;
+            if(at.attacking || at.charging || at.alpha < 1) return;
             at.attacking = true;
-            slashes.push({ x: at.x + at.w/2 + (at.dir * 40), y: at.y + at.h/2, life: 12, dir: at.dir, color: col });
+            slashes.push({ x: ta.x + ta.w/2 + (Math.random()-0.5)*60, y: ta.y + ta.h/2 + (Math.random()-0.5)*60, life: 12, dir: (Math.random()>0.5?1:-1), color: col });
             let d = Math.abs((at.x+at.w/2) - (ta.x+ta.w/2));
-            if(d < at.w * 0.9 && Math.abs(at.y - ta.y) < 100) {
-                if(ta.charging) { ta.hp -= 2; }
-                else { ta.hp -= 8; playSound('hit'); shakeTime = 10; createParticles(ta.x+ta.w/2, ta.y+ta.h/2, col); }
+            if(d < at.w * 1.1 && Math.abs(at.y - ta.y) < 100) {
+                ta.hp -= (ta.charging ? 2 : 7); playSound('hit'); shakeTime = 5;
             }
-            let s = 0;
-            let a = setInterval(() => { if(!paused) { at.attackAngle = Math.sin(s)*0.6; s+=0.8; if(s>Math.PI){clearInterval(a); at.attacking=false; at.attackAngle=0;} } }, 25);
+            setTimeout(() => at.attacking = false, 200);
         }
 
-        function createParticles(x,y,c){ for(let i=0;i<8;i++) particles.push({x,y,vx:(Math.random()-0.5)*10,vy:(Math.random()-0.5)*10,life:1,color:c}); }
+        function performUltimate(at, ta, col) {
+            if(at.mana < 100 || at.invul) return;
+            at.mana = 0; at.invul = true;
+            let hits = 0;
+            let interval = setInterval(() => {
+                at.alpha = 0;
+                playSound('blink');
+                at.x = ta.x + (Math.random() > 0.5 ? 120 : -120);
+                at.y = ta.y + (Math.random()-0.5)*100;
+                slashes.push({ x: ta.x + ta.w/2, y: ta.y + ta.h/2, life: 20, dir: (Math.random()>0.5?1:-1), color: col, scale: 2.5 });
+                ta.hp -= 4; shakeTime = 8;
+                hits++;
+                if(hits > 10) { clearInterval(interval); at.alpha = 1; at.invul = false; at.y = at.ground; }
+            }, 100);
+        }
 
         document.getElementById("startButton").onclick = () => {
-            p1.img.src = heroes[p1Idx].img; p1.speed = heroes[p1Idx].speed;
-            p2.img.src = heroes[p2Idx].img; p2.speed = heroes[p2Idx].speed + 0.5;
+            p1.img.src = heroes[p1Idx].img; p2.img.src = heroes[p2Idx].img;
             document.getElementById("startOverlay").style.display = "none";
             gameActive = true; music.play(); resize(); update();
         };
 
         function update() {
             if(!gameActive || isGameOver) return;
-            if(!paused) {
-                // Gambar Background di sini agar muncul kembali
-                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-                
-                if(shakeTime > 0) { ctx.translate((Math.random()-0.5)*10, (Math.random()-0.5)*10); shakeTime--; }
+            ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+            if(shakeTime > 0) { ctx.translate((Math.random()-0.5)*15, (Math.random()-0.5)*15); shakeTime--; }
 
-                // Player 1
-                p1.charging = keys["KeyS"] && !p1.jumping;
-                if(p1.charging) {
-                    if(p1.mana < 100) { p1.mana += 0.8; if(Math.random() < 0.3) playSound('charge'); }
-                    // Efek Aura Saiyan
-                    for(let i=0; i<2; i++) auras.push({x: p1.x+p1.w/2+(Math.random()-0.5)*p1.w, y: p1.y+p1.h, vy: -Math.random()*10, life: 1, color: heroes[p1Idx].color});
-                } else {
-                    if(keys["KeyA"] && p1.x > 0) p1.x -= p1.speed;
-                    if(keys["KeyD"] && p1.x < canvas.width - p1.w) p1.x += p1.speed;
-                    if(keys["KeyW"]) jump(p1);
-                    if(keys["Space"]) startAttack(p1, p2, heroes[p1Idx].color);
-                    if(keys["KeyF"]) { 
-                        if (p1.mana >= heroes[p1Idx].manaCost) {
-                            p1.mana -= heroes[p1Idx].manaCost;
-                            projectiles.push({ x: p1.dir === 1 ? p1.x + p1.w : p1.x, y: p1.y + p1.h/2, vx: p1.dir * 14, color: heroes[p1Idx].color, dmg: heroes[p1Idx].dmg, owner: p1 });
-                        }
-                        keys["KeyF"] = false; 
-                    }
-                    if(keys["KeyR"] && p1.mana >= 100) {
-                        p1.mana = 0;
-                        let c = 0; let itv = setInterval(() => { startAttack(p1, p2, heroes[p1Idx].color); c++; if(c>6) clearInterval(itv); }, 100);
-                    }
+            // P1 Logic
+            p1.charging = keys["KeyS"] && !p1.jumping;
+            if(p1.charging) {
+                p1.mana = Math.min(100, p1.mana + 0.8);
+                auras.push({x: p1.x+p1.w/2, y: p1.y+p1.h, vy: -12, life: 1, color: heroes[p1Idx].color});
+            } else if(!p1.invul) {
+                if(keys["KeyA"] && p1.x > 0) p1.x -= heroes[p1Idx].speed;
+                if(keys["KeyD"] && p1.x < canvas.width - p1.w) p1.x += heroes[p1Idx].speed;
+                if(keys["KeyW"] && !p1.jumping) { p1.vy = -18; p1.jumping = true; playSound('jump'); }
+                if(keys["Space"]) startAttack(p1, p2, heroes[p1Idx].color);
+                if(keys["KeyR"]) performUltimate(p1, p2, heroes[p1Idx].color);
+                if(keys["KeyF"] && p1.mana >= 25) {
+                    p1.mana -= 25;
+                    projectiles.push({x: p1.x+p1.w/2, y: p1.y+p1.h/2, vx: p1.dir*15, color: heroes[p1Idx].color, owner: p1});
+                    keys["KeyF"] = false;
                 }
-
-                // AI P2 
-                let p2IsAI = (Date.now() - p2.lastInput > 3000);
-                if(p2IsAI) {
-                    let dist = p1.x - p2.x;
-                    if(p2.mana < 30 && Math.random() < 0.02) p2.charging = true; 
-                    else p2.charging = false;
-
-                    if(!p2.charging) {
-                        if(Math.abs(dist) > 120) p2.x += (dist > 0 ? 1 : -1) * (p2.speed * 0.7);
-                        if(Math.abs(dist) < 100 && Math.random() < 0.05) startAttack(p2, p1, heroes[p2Idx].color);
-                    } else {
-                        p2.mana += 0.5;
-                        auras.push({x: p2.x+p2.w/2+(Math.random()-0.5)*p2.w, y: p2.y+p2.h, vy: -Math.random()*10, life: 1, color: heroes[p2Idx].color});
-                    }
-                }
-
-                // Physics
-                [p1, p2].forEach(p => {
-                    p.y += p.vy;
-                    if(p.y < p.ground) p.vy += gravity; else { p.y = p.ground; p.vy = 0; p.jumping = false; }
-                    if(!p.charging && p.mana < 100) p.mana += 0.1;
-                });
-                p1.dir = (p1.x < p2.x) ? 1 : -1;
-                p2.dir = (p2.x < p1.x) ? 1 : -1;
-
-                // Draw Aura
-                auras.forEach((a, i) => {
-                    ctx.fillStyle = a.color; ctx.globalAlpha = a.life;
-                    ctx.beginPath(); ctx.arc(a.x, a.y, Math.random()*10, 0, Math.PI*2); ctx.fill();
-                    a.y += a.vy; a.life -= 0.05; if(a.life <= 0) auras.splice(i,1);
-                });
-
-                // Draw Slash
-                slashes.forEach((s, i) => {
-                    ctx.strokeStyle = s.color; ctx.lineWidth = s.life; ctx.beginPath();
-                    ctx.arc(s.x, s.y, 50, -0.5*Math.PI, 0.5*Math.PI, s.dir === -1);
-                    ctx.stroke(); s.life -= 2; if(s.life <= 0) slashes.splice(i,1);
-                });
-
-                // Projectiles
-                projectiles.forEach((p,i) => {
-                    p.x += p.vx; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 10, 0, Math.PI*2); ctx.fill();
-                    let t = (p.owner === p1) ? p2 : p1;
-                    if(p.x > t.x && p.x < t.x + t.w && p.y > t.y && p.y < t.y + t.h) {
-                        t.hp -= t.charging ? p.dmg * 0.3 : p.dmg;
-                        projectiles.splice(i,1); shakeTime = 10;
-                    }
-                    if(p.x < 0 || p.x > canvas.width) projectiles.splice(i,1);
-                });
-
-                particles.forEach((p,i) => { p.x+=p.vx; p.y+=p.vy; p.life-=0.03; ctx.fillStyle=p.color; ctx.globalAlpha=p.life; ctx.fillRect(p.x,p.y,3,3); if(p.life<=0) particles.splice(i,1); });
-                
-                ctx.globalAlpha = 1.0;
-                draw(p1, p1Idx); draw(p2, p2Idx);
-
-                document.getElementById("hp-p1").style.width = Math.max(0, p1.hp) + "%";
-                document.getElementById("hp-p2").style.width = Math.max(0, p2.hp) + "%";
-                document.getElementById("mana-p1").style.width = p1.mana + "%";
-                document.getElementById("mana-p2").style.width = p2.mana + "%";
-
-                if(p1.hp <= 0 || p2.hp <= 0) { isGameOver = true; alert(p1.hp <= 0 ? "P2 WIN" : "P1 WIN"); location.reload(); }
             }
+
+            // GOD AI Logic (P2)
+            let dist = p1.x - p2.x;
+            if(!p2.invul) {
+                if(p2.mana < 30 && Math.abs(dist) > 250) {
+                    p2.charging = true; p2.mana += 0.7;
+                    auras.push({x: p2.x+p2.w/2, y: p2.y+p2.h, vy: -12, life: 1, color: heroes[p2Idx].color});
+                } else {
+                    p2.charging = false;
+                    if(Math.abs(dist) > 500 && Math.random() < 0.03) { p2.x = p1.x - (p1.dir*120); playSound('blink'); }
+                    if(Math.abs(dist) < 130) { if(Math.random() < 0.12) startAttack(p2, p1, heroes[p2Idx].color); }
+                    else { p2.x += (dist > 0 ? 1 : -1) * (heroes[p2Idx].speed + 1.2); }
+                    if(p2.mana >= 100) performUltimate(p2, p1, heroes[p2Idx].color);
+                    if(p2.mana > 40 && Math.random() < 0.02) {
+                        p2.mana -= 25;
+                        projectiles.push({x: p2.x+p2.w/2, y: p2.y+p2.h/2, vx: p2.dir*15, color: heroes[p2Idx].color, owner: p2});
+                    }
+                }
+            }
+
+            // Global Updates
+            [p1, p2].forEach(p => {
+                p.y += p.vy;
+                if(p.y < p.ground) p.vy += gravity; else { p.y = p.ground; p.vy = 0; p.jumping = false; }
+                p.dir = (p === p1) ? (p1.x < p2.x ? 1 : -1) : (p2.x < p1.x ? 1 : -1);
+                if(!p.charging && p.mana < 100) p.mana += 0.05;
+            });
+
+            auras.forEach((a, i) => {
+                ctx.fillStyle = a.color; ctx.globalAlpha = a.life;
+                ctx.fillRect(a.x+(Math.random()-0.5)*70, a.y, 12, 12);
+                a.y += a.vy; a.life -= 0.04; if(a.life <= 0) auras.splice(i,1);
+            });
+
+            slashes.forEach((s, i) => {
+                ctx.strokeStyle = s.color; ctx.lineWidth = 8; ctx.beginPath();
+                let sz = s.scale || 1; ctx.arc(s.x, s.y, 45 * sz, -0.5*Math.PI, 0.5*Math.PI, s.dir === -1);
+                ctx.stroke(); s.life -= 2; if(s.life <= 0) slashes.splice(i,1);
+            });
+
+            projectiles.forEach((p,i) => {
+                p.x += p.vx; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 12, 0, Math.PI*2); ctx.fill();
+                let target = (p.owner === p1) ? p2 : p1;
+                if(Math.abs(p.x - (target.x+target.w/2)) < 60 && Math.abs(p.y - (target.y+target.h/2)) < 60) {
+                    target.hp -= 12; projectiles.splice(i,1); shakeTime = 10;
+                }
+                if(p.x < 0 || p.x > canvas.width) projectiles.splice(i,1);
+            });
+
+            ctx.globalAlpha = 1;
+            draw(p1, p1Idx); draw(p2, p2Idx);
+
+            document.getElementById("hp-p1").style.width = Math.max(0, p1.hp) + "%";
+            document.getElementById("hp-p2").style.width = Math.max(0, p2.hp) + "%";
+            document.getElementById("mana-p1").style.width = p1.mana + "%";
+            document.getElementById("mana-p2").style.width = p2.mana + "%";
+
+            if(p1.hp <= 0 || p2.hp <= 0) { isGameOver = true; alert(p1.hp <= 0 ? "GAME OVER: AI MENANG!" : "VICTORY: KAMU MENANG!"); location.reload(); }
             requestAnimationFrame(update);
         }
 
         function draw(c, idx) {
-            ctx.save(); ctx.translate(c.x + c.w/2, c.y + c.h/2);
-            if(c.charging) { 
-                ctx.shadowBlur = 20; ctx.shadowColor = heroes[idx].color;
-                ctx.scale(1.05, 1.05); // Sedikit membesar saat charge
-            }
+            ctx.save(); ctx.globalAlpha = c.alpha;
+            ctx.translate(c.x + c.w/2, c.y + c.h/2);
             let s = c.dir; if(heroes[idx].flip) s *= -1;
-            ctx.scale(s, 1); ctx.rotate(c.attackAngle);
-            ctx.drawImage(c.img, -c.w/2, -c.h/2, c.w, c.h); ctx.restore();
+            ctx.scale(s, 1);
+            ctx.drawImage(c.img, -c.w/2, -c.h/2, c.w, c.h);
+            ctx.restore();
         }
         initSelection();
     </script>
