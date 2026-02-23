@@ -1,47 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Shadow Mage - Full Fix</title>
+    <title>Shadow Mage - Ultimate Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body { margin: 0; background: #111; overflow: hidden; font-family: 'Courier New', monospace; touch-action: none; color: white; }
         canvas { display: block; background: #222; }
         
+        /* OVERLAY PEMILIH KARAKTER DENGAN SCROLL */
         #startOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 100; padding: 10px;
         }
 
-        .select-container { display: flex; justify-content: center; gap: 10px; width: 100%; max-width: 800px; }
-        .select-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; }
-        .char-card { border: 1px solid #444; padding: 3px; text-align: center; cursor: pointer; border-radius: 5px; background: #222; width: 50px; font-size: 7px; }
+        .select-container { 
+            display: flex; justify-content: center; gap: 10px; width: 100%; 
+            max-width: 800px; max-height: 60vh; overflow-y: auto; /* Agar bisa di-scroll jika karakter banyak */
+            padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;
+        }
+        
+        .select-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .char-card { border: 1px solid #444; padding: 3px; text-align: center; cursor: pointer; border-radius: 5px; background: #222; width: 55px; font-size: 8px; }
         .char-card.selected-p1 { border-color: #00ffff; box-shadow: 0 0 8px #00ffff; }
         .char-card.selected-p2 { border-color: #ff4444; box-shadow: 0 0 8px #ff4444; }
-        .char-card img { width: 35px; height: 35px; display: block; margin: 0 auto 2px; border-radius: 3px; object-fit: cover; }
+        .char-card img { width: 40px; height: 40px; display: block; margin: 0 auto 2px; border-radius: 3px; object-fit: cover; }
         
-        #startButton { margin-top: 15px; padding: 10px 30px; font-size: 18px; font-weight: bold; background: #00ffff; border: none; border-radius: 8px; cursor: pointer; }
+        #startButton { margin-top: 20px; padding: 12px 40px; font-size: 18px; font-weight: bold; background: #00ffff; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        #startButton:hover { background: #fff; transform: scale(1.1); }
 
         #ui { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-around; pointer-events: none; z-index: 10; }
         .hp-bar { width: 120px; height: 14px; background: #444; border: 2px solid #fff; border-radius: 4px; position: relative; }
         .hp-fill { height: 100%; background: #ff4444; width: 100%; transition: 0.1s; }
         .mana-fill { position: absolute; bottom: -6px; left: 0; height: 4px; background: #4444ff; width: 100%; }
 
+        /* PAUSE MENU */
+        #pauseOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 150;
+        }
+
+        /* TOMBOL KONTROL HP */
         #mobileControls {
             position: fixed; bottom: 20px; width: 100%; display: none;
             justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 50;
         }
         .touch-btn {
-            width: 60px; height: 60px; background: rgba(255,255,255,0.1);
+            width: 55px; height: 55px; background: rgba(255,255,255,0.1);
             border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            font-weight: bold; user-select: none; -webkit-user-select: none;
+            font-weight: bold; user-select: none;
         }
-        .touch-btn:active { background: rgba(0,255,255,0.3); transform: scale(0.9); }
         
-        @media (pointer: coarse) {
-            #mobileControls { display: flex; }
-        }
+        #btn-pause { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; font-size: 12px; z-index: 100; pointer-events: auto; }
+
+        @media (pointer: coarse) { #mobileControls { display: flex; } }
     </style>
 </head>
 <body>
@@ -49,25 +63,34 @@
     <audio id="bgMusic" loop><source src="naruto.mp3" type="audio/mpeg"></audio>
 
     <div id="startOverlay">
-        <h2 style="margin: 0 0 10px 0; color: #00ffff; font-size: 20px;">SHADOW MAGE</h2>
+        <h2 style="margin: 0 0 10px 0; color: #00ffff; font-size: 22px; text-shadow: 0 0 10px #00ffff;">SHADOW MAGE</h2>
+        <p style="font-size: 10px; margin-bottom: 10px;">Pilih Karakter (Scroll jika tidak terlihat)</p>
         <div class="select-container">
-            <div><div id="p1-box" class="select-box"></div></div>
-            <div><div id="p2-box" class="select-box"></div></div>
+            <div id="p1-box" class="select-box"></div>
+            <div style="width: 2px; background: #444;"></div>
+            <div id="p2-box" class="select-box"></div>
         </div>
         <button id="startButton">MULAI BERTARUNG</button>
     </div>
 
+    <div id="pauseOverlay">
+        <h1 style="color: #00ffff;">PERMAINAN BERHENTI</h1>
+        <button onclick="togglePause()" style="padding: 10px 30px; font-weight: bold; cursor: pointer;">LANJUTKAN</button>
+        <p style="font-size: 12px; margin-top: 10px;">Tekan 'P' untuk lanjut</p>
+    </div>
+
     <div id="ui">
         <div><div class="hp-bar"><div id="hp-p1" class="hp-fill"></div><div id="mana-p1" class="mana-fill"></div></div></div>
+        <div id="btn-pause" class="touch-btn" onclick="togglePause()">||</div>
         <div><div class="hp-bar"><div id="hp-p2" class="hp-fill"></div><div id="mana-p2" class="mana-fill"></div></div></div>
     </div>
 
     <div id="mobileControls">
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 8px;">
             <div class="touch-btn" id="t-left">←</div>
             <div class="touch-btn" id="t-right">→</div>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 8px;">
             <div class="touch-btn" id="t-hit" style="background: rgba(255, 68, 68, 0.2);">HIT</div>
             <div class="touch-btn" id="t-magic" style="background: rgba(68, 68, 255, 0.2);">MAG</div>
         </div>
@@ -80,10 +103,8 @@
         const ctx = canvas.getContext("2d");
         const music = document.getElementById("bgMusic");
 
-        // 1. TAMBAHKAN LOGIKA BACKGROUND DI SINI
         const bgImages = ["background.jpeg", "beach.jpeg", "stone.jpeg", "snow.jpeg"];
         const bgImg = new Image();
-        // Memilih satu background secara acak saat halaman dibuka
         bgImg.src = bgImages[Math.floor(Math.random() * bgImages.length)];
 
         const heroes = [
@@ -96,13 +117,16 @@
             { name: "Agus", img: "agus.png", speed: 6, color: "yellow", dmg: 23, manaCost: 19, flip: true },
             { name: "Tarno", img: "tarno.png", speed: 7, color: "orange", dmg: 25, manaCost: 40, flip: false },
             { name: "Sai", img: "sai.png", speed: 7, color: "black", dmg: 24, manaCost: 25, flip: false },
-            {name: "Ghost rider", img: "rider.png", speed: 8, color: "#fcff00", dmg: 23, manaCost: 23, flip: false },
-            { name: "Sukuna", img: "sukuna.png", speed: 9, color: "white", dmg: 22, manaCost: 22, flip: false }
-            
+            { name: "Ghost rider", img: "rider.png", speed: 8, color: "#fcff00", dmg: 23, manaCost: 23, flip: false },
+            { name: "Sukuna", img: "sukuna.png", speed: 9, color: "white", dmg: 22, manaCost: 22, flip: false },
+            { name: "Alex", img: "as.gif", speed: 5, color: "blue", dmg: 21, manaCost: 22, flip: false },
+            { name: "Saske", img: "saske.gif", speed: 7, color: "#fcff00", dmg: 22, manaCost: 24, flip: false },
+            { name: "Ryu", img: "ryu.gif", speed: 6, color: "blue", dmg: 21, manaCost: 23, flip: false },
+            { name: "X-MAN", img: "wolf.gif", speed: 7, color: "yellow", dmg: 21, manaCost: 23, flip: false }
         ];
 
         let p1Idx = 0, p2Idx = 1;
-        let gameActive = false, isGameOver = false, shakeTime = 0;
+        let gameActive = false, isGameOver = false, paused = false, shakeTime = 0;
         let projectiles = [], particles = [], keys = {};
 
         const p1 = { x: 100, y: 0, w: 0, h: 0, hp: 100, mana: 100, dir: 1, attacking: false, attackAngle: 0, img: new Image(), flip: false };
@@ -123,9 +147,17 @@
             pNum===1 ? p1Idx = idx : p2Idx = idx;
         }
 
+        // FUNGSI PAUSE
+        function togglePause() {
+            if(!gameActive || isGameOver) return;
+            paused = !paused;
+            document.getElementById("pauseOverlay").style.display = paused ? "flex" : "none";
+            if(paused) music.pause(); else music.play();
+        }
+
         const bindTouch = (id, key) => {
             const el = document.getElementById(id);
-            el.ontouchstart = (e) => { e.preventDefault(); keys[key] = true; if(key==='Space') startAttack(p1,p2,heroes[p1Idx].color); if(key==='KeyF') shootMagic(p1,p1Idx); };
+            el.ontouchstart = (e) => { e.preventDefault(); if(!paused) { keys[key] = true; if(key==='Space') startAttack(p1,p2,heroes[p1Idx].color); if(key==='KeyF') shootMagic(p1,p1Idx); } };
             el.ontouchend = () => keys[key] = false;
         };
         bindTouch('t-left', 'KeyA');
@@ -142,7 +174,10 @@
         }
 
         window.addEventListener("resize", resize);
-        window.addEventListener("keydown", e => { keys[e.code] = true; if(gameActive) handlePCAction(e.code); });
+        window.addEventListener("keydown", e => { 
+            if(e.code === "KeyP" || e.code === "Escape") togglePause();
+            if(!paused) { keys[e.code] = true; if(gameActive) handlePCAction(e.code); }
+        });
         window.addEventListener("keyup", e => keys[e.code] = false);
 
         function handlePCAction(code) {
@@ -153,17 +188,17 @@
         }
 
         function startAttack(at, ta, col) {
-            if(at.attacking || isGameOver) return;
+            if(at.attacking || isGameOver || paused) return;
             at.attacking = true;
             let d = Math.abs((at.x+at.w/2) - (ta.x+ta.w/2));
             if(d < at.w * 0.9) { ta.hp -= 8; shakeTime = 10; createParticles(ta.x+ta.w/2, ta.y+ta.h/2, col); }
             let s = 0;
-            let a = setInterval(() => { at.attackAngle = Math.sin(s)*0.5; s+=0.6; if(s>Math.PI){clearInterval(a); at.attacking=false; at.attackAngle=0;} }, 30);
+            let a = setInterval(() => { if(!paused) { at.attackAngle = Math.sin(s)*0.5; s+=0.6; if(s>Math.PI){clearInterval(a); at.attacking=false; at.attackAngle=0;} } }, 30);
         }
 
         function shootMagic(c, idx) {
             const h = heroes[idx];
-            if (c.mana >= h.manaCost && !isGameOver) {
+            if (c.mana >= h.manaCost && !isGameOver && !paused) {
                 c.mana -= h.manaCost;
                 projectiles.push({ x: c.dir === 1 ? c.x + c.w : c.x, y: c.y + c.h/2, vx: c.dir * 14, color: h.color, dmg: h.dmg, owner: c });
             }
@@ -181,49 +216,49 @@
         function update() {
             if(!gameActive || isGameOver) return;
             
-            // 2. GANTI ctx.clearRect DENGAN DRAWIMAGE BACKGROUND
-            ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+            if(!paused) {
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+                if(shakeTime > 0) { ctx.translate((Math.random()-0.5)*10, (Math.random()-0.5)*10); shakeTime--; }
 
-            if(shakeTime > 0) { ctx.translate((Math.random()-0.5)*10, (Math.random()-0.5)*10); shakeTime--; }
+                if(keys["KeyA"] && p1.x > 0) p1.x -= p1.speed;
+                if(keys["KeyD"] && p1.x < canvas.width - p1.w) p1.x += p1.speed;
+                p1.dir = (p1.x < p2.x) ? 1 : -1;
 
-            if(keys["KeyA"] && p1.x > 0) p1.x -= p1.speed;
-            if(keys["KeyD"] && p1.x < canvas.width - p1.w) p1.x += p1.speed;
-            p1.dir = (p1.x < p2.x) ? 1 : -1;
+                let p2IsAI = (Date.now() - p2.lastInput > 3000);
+                if(!p2IsAI) {
+                    if(keys["ArrowLeft"] && p2.x > 0) { p2.x -= p2.speed; p2.lastInput = Date.now(); }
+                    if(keys["ArrowRight"] && p2.x < canvas.width - p2.w) { p2.x += p2.speed; p2.lastInput = Date.now(); }
+                } else {
+                    let dist = p1.x - p2.x;
+                    if(Math.abs(dist) > p1.w * 0.7) p2.x += (dist > 0 ? 1 : -1) * (p2.speed * 0.8);
+                    if(Math.abs(dist) < p1.w * 0.8 && Math.random() < 0.05) startAttack(p2, p1, heroes[p2Idx].color);
+                    if(Math.abs(dist) > 200 && Math.random() < 0.02) shootMagic(p2, p2Idx);
+                }
+                p2.dir = (p2.x < p1.x) ? 1 : -1;
 
-            let p2IsAI = (Date.now() - p2.lastInput > 3000);
-            if(!p2IsAI) {
-                if(keys["ArrowLeft"] && p2.x > 0) { p2.x -= p2.speed; p2.lastInput = Date.now(); }
-                if(keys["ArrowRight"] && p2.x < canvas.width - p2.w) { p2.x += p2.speed; p2.lastInput = Date.now(); }
-            } else {
-                let dist = p1.x - p2.x;
-                if(Math.abs(dist) > p1.w * 0.7) p2.x += (dist > 0 ? 1 : -1) * (p2.speed * 0.8);
-                if(Math.abs(dist) < p1.w * 0.8 && Math.random() < 0.05) startAttack(p2, p1, heroes[p2Idx].color);
-                if(Math.abs(dist) > 200 && Math.random() < 0.02) shootMagic(p2, p2Idx);
+                if(p1.mana < 100) p1.mana += 0.3;
+                if(p2.mana < 100) p2.mana += 0.3;
+
+                projectiles.forEach((p,i) => {
+                    p.x += p.vx; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI*2); ctx.fill();
+                    let t = (p.owner === p1) ? p2 : p1;
+                    if(p.x > t.x && p.x < t.x + t.w && p.y > t.y && p.y < t.y + t.h) { t.hp -= p.dmg; createParticles(p.x,p.y,p.color); projectiles.splice(i,1); shakeTime=10; }
+                    if(p.x < -50 || p.x > canvas.width + 50) projectiles.splice(i,1);
+                });
+
+                particles.forEach((p,i) => { p.x+=p.vx; p.y+=p.vy; p.life-=0.03; ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,3,3); if(p.life<=0) particles.splice(i,1); });
+                ctx.globalAlpha = 1.0;
+
+                draw(p1);
+                ctx.save(); if(p2IsAI) ctx.filter = "contrast(1.5) drop-shadow(0 0 5px red)"; draw(p2); ctx.restore();
+
+                document.getElementById("hp-p1").style.width = Math.max(0, p1.hp) + "%";
+                document.getElementById("hp-p2").style.width = Math.max(0, p2.hp) + "%";
+                document.getElementById("mana-p1").style.width = p1.mana + "%";
+                document.getElementById("mana-p2").style.width = p2.mana + "%";
+
+                if(p1.hp <= 0 || p2.hp <= 0) { isGameOver = true; setTimeout(() => { alert(p1.hp <= 0 ? "P2/AI WIN!" : "P1 WIN!"); location.reload(); }, 200); }
             }
-            p2.dir = (p2.x < p1.x) ? 1 : -1;
-
-            if(p1.mana < 100) p1.mana += 0.3;
-            if(p2.mana < 100) p2.mana += 0.3;
-
-            projectiles.forEach((p,i) => {
-                p.x += p.vx; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI*2); ctx.fill();
-                let t = (p.owner === p1) ? p2 : p1;
-                if(p.x > t.x && p.x < t.x + t.w && p.y > t.y && p.y < t.y + t.h) { t.hp -= p.dmg; createParticles(p.x,p.y,p.color); projectiles.splice(i,1); shakeTime=10; }
-                if(p.x < -50 || p.x > canvas.width + 50) projectiles.splice(i,1);
-            });
-
-            particles.forEach((p,i) => { p.x+=p.vx; p.y+=p.vy; p.life-=0.03; ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,3,3); if(p.life<=0) particles.splice(i,1); });
-            ctx.globalAlpha = 1.0;
-
-            draw(p1);
-            ctx.save(); if(p2IsAI) ctx.filter = "contrast(1.5) drop-shadow(0 0 5px red)"; draw(p2); ctx.restore();
-
-            document.getElementById("hp-p1").style.width = Math.max(0, p1.hp) + "%";
-            document.getElementById("hp-p2").style.width = Math.max(0, p2.hp) + "%";
-            document.getElementById("mana-p1").style.width = p1.mana + "%";
-            document.getElementById("mana-p2").style.width = p2.mana + "%";
-
-            if(p1.hp <= 0 || p2.hp <= 0) { isGameOver = true; setTimeout(() => { alert(p1.hp <= 0 ? "P2/AI WIN!" : "P1 WIN!"); location.reload(); }, 200); }
             requestAnimationFrame(update);
         }
 
